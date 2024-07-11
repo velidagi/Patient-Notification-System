@@ -15,9 +15,13 @@ public class Patient {
     @Column(name = "ID")
     private int id;
 
-    @Column(name = "MARK")
-    private int mark;
-
     @Column(name = "NAME")
     private String name;
+
+    private int TCKN;
+
+    private int Passport_Number;
+
+    @Column(name = "GENDER")
+    private String gender;
 }
