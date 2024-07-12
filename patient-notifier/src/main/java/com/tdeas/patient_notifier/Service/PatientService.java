@@ -5,13 +5,15 @@ import com.tdeas.patient_notifier.Repository.PatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class PatientService {
 
     @Autowired
-    private PatientRepo patientRepository;
+    private PatientRepo patientRepo;
 
     public Patient savePatient(Patient patient) {
-        return patientRepository.save(patient);
+        return patientRepo.save(patient);
     }
 }

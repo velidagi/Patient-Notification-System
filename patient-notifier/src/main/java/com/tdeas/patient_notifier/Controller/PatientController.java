@@ -28,7 +28,7 @@ public class PatientController {
     }
 
 
-    @PostMapping("/addPatient")
+    @PostMapping
     public Patient postPatient(@RequestBody Patient newPatient) {
         return patientService.savePatient(newPatient);
     }
@@ -63,4 +63,17 @@ public class PatientController {
         patientRepo.deleteById(patientId);
     }
 
+    @GetMapping("/findByName/{name}")
+    public List<Patient> findPatientsByName(@PathVariable String name) {
+        return patientRepo.findByName(name);
+    }
+
+    @GetMapping("/findByAgeRange/{minAge}/{maxAge}")
+    public List<Patient> findPatientsByAgeRange(@PathVariable int minAge, @PathVariable int maxAge) {
+        return patientRepo.findByAgeRange(minAge, maxAge);
+    }
+    @GetMapping("/findByNotificationPreference/{preference}")
+    public List<Patient> findPatientsByNotificationPreference(@PathVariable String preference) {
+        return patientRepo.findByNotificationPreference(preference);
+    }
 }
