@@ -28,21 +28,21 @@ public class PatientController {
     }
 
 
-    @PostMapping
-    public Patient postPatient(@RequestBody Patient newPatient) {
-        return patientService.savePatient(newPatient);
-    }
-
     @GetMapping("/{patientId}")
     public Patient getOnePatient(@PathVariable Long patientId){
         return patientRepo.findById(patientId).orElse(null);
+    }
+    @PostMapping("/addPatient")
+    public Patient postPatient(@RequestBody Patient newPatient) {
+        Patient savedPatient = patientService.savePatient(newPatient);
+        patientService.updateFilteredDatabase(savedPatient);
+        return savedPatient;
     }
 
     @PutMapping("/{patientId}")
     public Patient updateOnePatient(@PathVariable long patientId, @RequestBody Patient newPatient){
         Optional<Patient> patient = patientRepo.findById(patientId);
-        if (patient.isPresent()) //Patient'ın olup olmadığını kontrol eder. Varsa if'e girer.
-        {
+        if (patient.isPresent()) {
             Patient foundPatient = patient.get();
             foundPatient.setName(newPatient.getName());
             foundPatient.setGender(newPatient.getGender());
@@ -53,15 +53,20 @@ public class PatientController {
             foundPatient.setPassportNumber(newPatient.getPassportNumber());
             foundPatient.setPhoneNumber(newPatient.getPhoneNumber());
             patientRepo.save(foundPatient);
+            patientService.updateFilteredDatabase(foundPatient);
             return foundPatient;
-        }else
+        } else {
             return null;
+        }
     }
 
     @DeleteMapping("/{patientId}")
     public void deleteOnePatient(@PathVariable long patientId){
         patientRepo.deleteById(patientId);
+        filteredPatientRepo.deleteById(patientId);
+
     }
+
 
     @GetMapping("/findByName/{name}")
     public List<Patient> findPatientsByName(@PathVariable String name) {
