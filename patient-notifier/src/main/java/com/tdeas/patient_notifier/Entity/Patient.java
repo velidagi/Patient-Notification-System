@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.util.List;
+import java.time.Period;
 
 import java.util.Date;
 
@@ -48,6 +49,12 @@ public class Patient {
 
     public Date getBirthDate() {
         return birthDate;
+    }
+
+    public int getAge() {
+        LocalDate today = LocalDate.now();
+        LocalDate birthLocalDate = new java.sql.Date(this.birthDate.getTime()).toLocalDate();
+        return Period.between(birthLocalDate, today).getYears();
     }
 
     public void setBirthDate(Date birthDate) {

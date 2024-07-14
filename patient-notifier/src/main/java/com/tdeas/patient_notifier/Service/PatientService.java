@@ -27,22 +27,26 @@ public class PatientService {
     public List<FilteredPatient> getAllFilteredPatients() {
         return filteredPatientRepository.findAll();
     }
+
     @Transactional
     public void addPatient(Patient patient) {
         patientRepository.save(patient);
 
-        FilteredPatient filteredPatient = new FilteredPatient();
-        filteredPatient.setPatient(patient);
-        filteredPatient.setName(patient.getName());
-        filteredPatient.setBirthDate(patient.getBirthDate());
-        filteredPatient.setGender(patient.getGender());
-        filteredPatient.setNationalId(patient.getNationalId());
-        filteredPatient.setPassportNumber(patient.getPassportNumber());
-        filteredPatient.setEmail(patient.getEmail());
-        filteredPatient.setPhoneNumber(patient.getPhoneNumber());
-        filteredPatient.setNotificationPreference(patient.getNotificationPreference());
+        if (patient.getAge() > 25 && patient.getGender().equalsIgnoreCase("Male")) {
+            // Create a filtered patient entry
+            FilteredPatient filteredPatient = new FilteredPatient();
+            filteredPatient.setPatient(patient);
+            filteredPatient.setName(patient.getName());
+            filteredPatient.setBirthDate(patient.getBirthDate());
+            filteredPatient.setGender(patient.getGender());
+            filteredPatient.setNationalId(patient.getNationalId());
+            filteredPatient.setPassportNumber(patient.getPassportNumber());
+            filteredPatient.setEmail(patient.getEmail());
+            filteredPatient.setPhoneNumber(patient.getPhoneNumber());
+            filteredPatient.setNotificationPreference(patient.getNotificationPreference());
 
-        filteredPatientRepository.save(filteredPatient);
+            filteredPatientRepository.save(filteredPatient);
+        }
     }
 
     @Transactional
