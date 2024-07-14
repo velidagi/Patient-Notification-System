@@ -1,72 +1,44 @@
 package com.tdeas.patient_notifier.Controller;
 
-
+import com.tdeas.patient_notifier.Entity.FilteredPatient;
 import com.tdeas.patient_notifier.Entity.Patient;
 import com.tdeas.patient_notifier.Repository.PatientRepo;
 import com.tdeas.patient_notifier.Service.PatientService;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/patients")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PatientController {
-
-    @Autowired
-    private PatientRepo patientRepo;
 
     @Autowired
     private PatientService patientService;
 
+    @Autowired
+    private PatientRepo patientRepo;
 
     @GetMapping
-    public List<Patient> getAllUsers(){
-        return patientRepo.findAll();
+    public List<Patient> getAllPatients() {
+        return patientService.getAllPatients();
     }
 
-
-    @GetMapping("/{patientId}")
-    public Patient getOnePatient(@PathVariable Long patientId){
-        return patientRepo.findById(patientId).orElse(null);
-    }
-    @PostMapping("/addPatient")
-    public Patient postPatient(@RequestBody Patient newPatient) {
-        Patient savedPatient = patientService.savePatient(newPatient);
-        patientService.updateFilteredDatabase(savedPatient);
-        return savedPatient;
+    @GetMapping("/filtered")
+    public List<FilteredPatient> getAllFilteredPatients() {
+        return patientService.getAllFilteredPatients();
     }
 
-    @PutMapping("/{patientId}")
-    public Patient updateOnePatient(@PathVariable long patientId, @RequestBody Patient newPatient){
-        Optional<Patient> patient = patientRepo.findById(patientId);
-        if (patient.isPresent()) {
-            Patient foundPatient = patient.get();
-            foundPatient.setName(newPatient.getName());
-            foundPatient.setGender(newPatient.getGender());
-            foundPatient.setBirthDate(newPatient.getBirthDate());
-            foundPatient.setEmail(newPatient.getEmail());
-            foundPatient.setNationalId(newPatient.getNationalId());
-            foundPatient.setNotificationPreference(newPatient.getNotificationPreference());
-            foundPatient.setPassportNumber(newPatient.getPassportNumber());
-            foundPatient.setPhoneNumber(newPatient.getPhoneNumber());
-            patientRepo.save(foundPatient);
-            patientService.updateFilteredDatabase(foundPatient);
-            return foundPatient;
-        } else {
-            return null;
-        }
+    @PostMapping
+    public void addPatient(@RequestBody Patient patient) {
+        patientService.addPatient(patient);
     }
 
-    @DeleteMapping("/{patientId}")
-    public void deleteOnePatient(@PathVariable long patientId){
-        patientRepo.deleteById(patientId);
-        filteredPatientRepo.deleteById(patientId);
-
+    @DeleteMapping("/{id}")
+    public void deletePatient(@PathVariable Long id) {
+        patientService.deletePatient(id);
     }
-
 
     @GetMapping("/findByName/{name}")
     public List<Patient> findPatientsByName(@PathVariable String name) {

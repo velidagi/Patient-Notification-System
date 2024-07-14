@@ -1,7 +1,8 @@
 package com.tdeas.patient_notifier.Entity;
 
 import jakarta.persistence.*;
-
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 import java.util.Date;
 
 @Entity
@@ -10,6 +11,11 @@ public class FilteredPatient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "patient_id")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private Patient patient;
 
     private String name;
 
@@ -29,8 +35,21 @@ public class FilteredPatient {
     private String notificationPreference;
 
     // Getters and Setters
+
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
     }
 
     public String getName() {
@@ -96,5 +115,4 @@ public class FilteredPatient {
     public void setNotificationPreference(String notificationPreference) {
         this.notificationPreference = notificationPreference;
     }
-
 }
