@@ -17,6 +17,10 @@ public class FilteredPatient {
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Patient patient;
 
+    @ManyToOne
+    @JoinColumn(name = "target_criteria")
+    private TargetCriteria targetCriteria;
+
     private String name;
 
     @Temporal(TemporalType.DATE)
@@ -50,6 +54,14 @@ public class FilteredPatient {
 
     public void setPatient(Patient patient) {
         this.patient = patient;
+    }
+
+    public TargetCriteria getTargetCriteria() {
+        return targetCriteria;
+    }
+
+    public void setTargetCriteria(TargetCriteria targetCriteria) {
+        this.targetCriteria = targetCriteria;
     }
 
     public String getName() {
