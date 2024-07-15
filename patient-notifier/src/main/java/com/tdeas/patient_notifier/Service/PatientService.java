@@ -38,26 +38,25 @@ public class PatientService {
     public void addPatient(Patient patient) {
         patientRepository.save(patient);
 
-        TargetCriteria targetCriteria = new TargetCriteria();
-
         if ((patient.getAge() > 50 && patient.getAge() <= 69) && patient.getGender().equalsIgnoreCase("Male")) {
-            targetCriteria.setTargetCriteria("Colon Cancer");
-            targetCriteriaRepo.save(targetCriteria);
+            TargetCriteria targetCriteria = targetCriteriaRepo.findById(1L)
+                    .orElseThrow(() -> new RuntimeException("Colon Cancer criteria not found"));
             createFilteredPatient(patient, targetCriteria);
         }
+
         if ((patient.getAge() > 40 && patient.getAge() <= 69) && patient.getGender().equalsIgnoreCase("Female")) {
-            targetCriteria.setTargetCriteria("Breast Cancer");
-            targetCriteriaRepo.save(targetCriteria);
+            TargetCriteria targetCriteria = targetCriteriaRepo.findById(2L)
+                    .orElseThrow(() -> new RuntimeException("Breast Cancer criteria not found"));
             createFilteredPatient(patient, targetCriteria);
         }
+
         if (patient.getAge() > 18 && patient.getNotificationPreference().equalsIgnoreCase("SMS")) {
-            targetCriteria.setTargetCriteria("Stay Fit");
-            targetCriteriaRepo.save(targetCriteria);
+            TargetCriteria targetCriteria = targetCriteriaRepo.findById(3L)
+                    .orElseThrow(() -> new RuntimeException("Stay Fit criteria not found"));
             createFilteredPatient(patient, targetCriteria);
-        } else {
-            // Handle other cases or add more conditions if needed
         }
     }
+
     private void createFilteredPatient(Patient patient, TargetCriteria targetCriteria) {
         FilteredPatient filteredPatient = new FilteredPatient();
         filteredPatient.setPatient(patient);
@@ -73,6 +72,7 @@ public class PatientService {
 
         filteredPatientRepository.save(filteredPatient);
     }
+
 
 
     @Transactional
