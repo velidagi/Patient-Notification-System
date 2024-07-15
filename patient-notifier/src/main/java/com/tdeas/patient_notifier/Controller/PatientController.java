@@ -1,10 +1,13 @@
 package com.tdeas.patient_notifier.Controller;
 
 import com.tdeas.patient_notifier.Entity.FilteredPatient;
+import com.tdeas.patient_notifier.Entity.NotificationResult;
 import com.tdeas.patient_notifier.Entity.Patient;
 import com.tdeas.patient_notifier.Repository.PatientRepo;
 import com.tdeas.patient_notifier.Service.PatientService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -52,5 +55,15 @@ public class PatientController {
     @GetMapping("/findByNotificationPreference/{preference}")
     public List<Patient> findPatientsByNotificationPreference(@PathVariable String preference) {
         return patientRepo.findByNotificationPreference(preference);
+    }
+
+    @PostMapping("/sendNotifications")
+    public ResponseEntity<List<NotificationResult>> sendNotifications() {
+        try {
+            List<NotificationResult> results = patientService.sendNotifications();
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

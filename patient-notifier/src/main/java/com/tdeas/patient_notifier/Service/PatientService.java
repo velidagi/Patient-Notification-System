@@ -1,20 +1,25 @@
 package com.tdeas.patient_notifier.Service;
 
 import com.tdeas.patient_notifier.Entity.FilteredPatient;
+import com.tdeas.patient_notifier.Entity.NotificationResult;
 import com.tdeas.patient_notifier.Entity.Patient;
 import com.tdeas.patient_notifier.Entity.TargetCriteria;
 import com.tdeas.patient_notifier.Repository.FilteredPatientRepo;
 import com.tdeas.patient_notifier.Repository.PatientRepo;
 import com.tdeas.patient_notifier.Repository.TargetCriteriaRepo;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 
 public class PatientService {
+    private static final Logger logger = LoggerFactory.getLogger(PatientService.class);
 
     @Autowired
     private PatientRepo patientRepository;
@@ -73,7 +78,50 @@ public class PatientService {
         filteredPatientRepository.save(filteredPatient);
     }
 
+    public List<NotificationResult> sendNotifications() {
+        List<FilteredPatient> filteredNotifications = filteredPatientRepository.findAll();
+        List<NotificationResult> notificationResults = new ArrayList<>();
+        int size = filteredNotifications.size();
+        System.out.println("filteredNotifications listesi " + size + " eleman içeriyor.");
+        for (FilteredPatient notification : filteredNotifications) {
+            String messageText = notification.getTargetCriteria().getMessage();
+            String patientName = notification.getPatient().getName();
+            String patientGender = notification.getPatient().getGender();
+            String notificationType = notification.getNotificationPreference();
 
+            // Send notification based on preference
+            if (notificationType.equals("Sms")) {
+                sendSmsNotification(notification.getPatient().getPhoneNumber(), messageText);
+            } else if (notificationType.equals("Mail")) {
+                sendEmailNotification(notification.getPatient().getEmail(), messageText);
+            }
+
+            // Collect notification results
+            NotificationResult result = new NotificationResult(
+                    notification.getPatient().getId(),
+                    patientName,
+                    patientGender,
+                    notificationType,
+                    messageText
+            );
+            notificationResults.add(result);
+        }
+
+        return notificationResults;
+    }
+
+    private void logNotificationDetails(Long patientId, String patientName, String patientGender, String notificationType, String message) {
+        logger.info("Notification sent to Patient ID: {}, Name: {}, Gender: {}, via {}: {}",
+                patientId, patientName, patientGender, notificationType, message);
+    }
+
+    private void sendSmsNotification(String phoneNumber, String message) {
+        // SMS gönderme işlemini gerçekleştirin
+    }
+
+    private void sendEmailNotification(String email, String message) {
+        // E-posta gönderme işlemini gerçekleştirin
+    }
 
     @Transactional
     public void deletePatient(Long patientId) {

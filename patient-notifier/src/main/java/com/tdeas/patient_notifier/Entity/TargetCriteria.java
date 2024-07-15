@@ -26,4 +26,8 @@ public class TargetCriteria {
     public void setTargetCriteria(String target_criteria_name) {
         this.target_criteria_name = target_criteria_name;
     }
+
+    public String getMessage() {
+        return message_text;
+    }
 }
