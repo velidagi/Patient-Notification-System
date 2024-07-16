@@ -1,15 +1,12 @@
 package com.tdeas.patient_notifier.Entity;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import lombok.Data;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.Date;
 
 @Entity
-public class FilteredPatient {
+public class PatientLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,12 +14,7 @@ public class FilteredPatient {
 
     @ManyToOne
     @JoinColumn(name = "patient_id")
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Patient patient;
-
-    @ManyToOne
-    @JoinColumn(name = "target_criteria")
-    private TargetCriteria targetCriteria;
 
     private String name;
 
@@ -41,8 +33,9 @@ public class FilteredPatient {
 
     private String notificationPreference;
 
-    // Getters and Setters
+    private int versionNumber;
 
+    private String changeReason;
     public Long getId() {
         return id;
     }
@@ -51,26 +44,12 @@ public class FilteredPatient {
         this.id = id;
     }
 
-    public Patient getPatient() {
-        return patient;
-    }
-
-    public void setPatient(Patient patient) {
-        this.patient = patient;
-    }
-
-    public TargetCriteria getTargetCriteria() {
-        return targetCriteria;
-    }
-
-    public void setTargetCriteria(TargetCriteria targetCriteria) {
-        this.targetCriteria = targetCriteria;
-    }
-
     public String getName() {
         return name;
     }
-
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
     public void setName(String name) {
         this.name = name;
     }
@@ -130,9 +109,20 @@ public class FilteredPatient {
     public void setNotificationPreference(String notificationPreference) {
         this.notificationPreference = notificationPreference;
     }
-    public int getAge() {
-        LocalDate today = LocalDate.now();
-        LocalDate birthLocalDate = new java.sql.Date(this.birthDate.getTime()).toLocalDate();
-        return Period.between(birthLocalDate, today).getYears();
+    public int getVersionNumber() {
+        return versionNumber;
+    }
+
+
+    public void setVersionNumber(int versionNumber) {
+        this.versionNumber = versionNumber;
+    }
+
+    public String getChangeReason() {
+        return changeReason;
+    }
+
+    public void setChangeReason(String changeReason) {
+        this.changeReason = changeReason;
     }
 }

@@ -1,10 +1,8 @@
 package com.tdeas.patient_notifier.Service;
 
-import com.tdeas.patient_notifier.Entity.FilteredPatient;
-import com.tdeas.patient_notifier.Entity.NotificationResult;
-import com.tdeas.patient_notifier.Entity.Patient;
-import com.tdeas.patient_notifier.Entity.TargetCriteria;
+import com.tdeas.patient_notifier.Entity.*;
 import com.tdeas.patient_notifier.Repository.FilteredPatientRepo;
+import com.tdeas.patient_notifier.Repository.PatientLogRepo;
 import com.tdeas.patient_notifier.Repository.PatientRepo;
 import com.tdeas.patient_notifier.Repository.TargetCriteriaRepo;
 import jakarta.transaction.Transactional;
@@ -15,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 
@@ -26,6 +25,9 @@ public class PatientService {
 
     @Autowired
     private FilteredPatientRepo filteredPatientRepository;
+
+    @Autowired
+    private PatientLogRepo patientLogRepo;
 
     @Autowired
     private TargetCriteriaRepo targetCriteriaRepo;
@@ -42,6 +44,7 @@ public class PatientService {
     @Transactional
     public void addPatient(Patient patient) {
         patientRepository.save(patient);
+        logChange(patient, 1, "Added");
 
         if ((patient.getAge() > 50 && patient.getAge() <= 69) && patient.getGender().equalsIgnoreCase("Male")) {
             TargetCriteria targetCriteria = targetCriteriaRepo.findById(1L)
@@ -77,7 +80,23 @@ public class PatientService {
 
         filteredPatientRepository.save(filteredPatient);
     }
+    private void logChange(Patient patient, int versionNumber, String changeReason) {
+        PatientLog patientLog = new PatientLog();
+        patientLog.setId(patient.getId());
+        patientLog.setPatient(patient);
+        patientLog.setName(patient.getName());
+        patientLog.setBirthDate(patient.getBirthDate());
+        patientLog.setGender(patient.getGender());
+        patientLog.setNationalId(patient.getNationalId());
+        patientLog.setPassportNumber(patient.getPassportNumber());
+        patientLog.setEmail(patient.getEmail());
+        patientLog.setPhoneNumber(patient.getPhoneNumber());
+        patientLog.setNotificationPreference(patient.getNotificationPreference());
+        patientLog.setVersionNumber(versionNumber);
+        patientLog.setChangeReason(changeReason);
 
+        patientLogRepo.save(patientLog);
+    }
     public List<NotificationResult> sendNotifications() {
         List<FilteredPatient> filteredNotifications = filteredPatientRepository.findAll();
         List<NotificationResult> notificationResults = new ArrayList<>();
@@ -85,9 +104,13 @@ public class PatientService {
         System.out.println("filteredNotifications listesi " + size + " eleman içeriyor.");
         for (FilteredPatient notification : filteredNotifications) {
             String messageText = notification.getTargetCriteria().getMessage();
+            String criteriaName = notification.getTargetCriteria().getTargetCriteria();
             String patientName = notification.getPatient().getName();
             String patientGender = notification.getPatient().getGender();
             String notificationType = notification.getNotificationPreference();
+            String phoneNumber = notification.getPhoneNumber();
+            String mail = notification.getEmail();
+            Integer age = notification.getAge();
 
             // Send notification based on preference
             if (notificationType.equals("Sms")) {
@@ -102,11 +125,14 @@ public class PatientService {
                     patientName,
                     patientGender,
                     notificationType,
-                    messageText
+                    messageText,
+                    phoneNumber,
+                    mail,
+                    criteriaName,
+                    age
             );
             notificationResults.add(result);
         }
-
         return notificationResults;
     }
 
@@ -125,8 +151,20 @@ public class PatientService {
 
     @Transactional
     public void deletePatient(Long patientId) {
-        filteredPatientRepository.deleteByPatientId(patientId);
-        patientRepository.deleteById(patientId);
+        Optional<Patient> existingPatient = patientRepository.findById(patientId);
+        if (existingPatient.isPresent()) {
+            Patient patient = existingPatient.get();
+            filteredPatientRepository.deleteByPatientId(patientId);
+            patientRepository.deleteById(patientId);
+            Optional<PatientLog> existingLogs = patientLogRepo.findById(patientId);
+
+            int nextVersionNumber = existingLogs.stream()
+                    .mapToInt(PatientLog::getVersionNumber)
+                    .max()
+                    .orElse(0) + 1;
+            logChange(patient, nextVersionNumber, "Deleted");
+
+        }
     }
 
 }

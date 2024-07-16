@@ -5,6 +5,9 @@ import com.tdeas.patient_notifier.Repository.FilteredPatientRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Period;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,4 +42,5 @@ public class FilteredPatientService {
     public FilteredPatient createOneFiltered(FilteredPatient newFiltered) {
         return filteredPatientRepo.save(newFiltered);
     }
+
 }
