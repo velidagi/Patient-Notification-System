@@ -194,6 +194,7 @@ public class PatientService {
             createFilteredPatient(existingPatient, targetCriteria);
         }
     }
+
     @Transactional
     public void deletePatient(Long patientId) {
         Optional<Patient> existingPatient = patientRepository.findById(patientId);

@@ -9,6 +9,10 @@ import java.util.List;
 
 public interface PatientRepo extends JpaRepository<Patient, Long> {
     List<Patient> findByName(String name);
+    List<Patient> findByNameContainingIgnoreCase(String name);
+
+    @Query("SELECT p FROM Patient p WHERE p.gender = :gender")
+    List<Patient> findByGender(@Param("gender") String gender);
     @Query("SELECT p FROM Patient p WHERE YEAR(CURRENT_DATE) - YEAR(p.birthDate) BETWEEN :minAge AND :maxAge")
     List<Patient> findByAgeRange(@Param("minAge") int minAge, @Param("maxAge") int maxAge);
     List<Patient> findByNotificationPreference(String preference);

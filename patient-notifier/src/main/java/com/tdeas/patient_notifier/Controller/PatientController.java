@@ -53,7 +53,27 @@ public class PatientController {
     public List<Patient> findPatientsByName(@PathVariable String name) {
         return patientRepo.findByName(name);
     }
+    @GetMapping("/search")
+    public List<Patient> searchPatients(
+            @RequestParam(value = "name", required = false) String name,
+            @RequestParam(value = "gender", required = false) String gender,
+            @RequestParam(value = "minAge", required = false) Integer minAge,
+            @RequestParam(value = "maxAge", required = false) Integer maxAge
+    ) {
+        List<Patient> patients;
 
+        if (name != null && !name.isEmpty()) {
+            patients = patientRepo.findByNameContainingIgnoreCase(name);
+        } else if (gender != null && !gender.isEmpty()) {
+            patients = patientRepo.findByGender(gender);
+        } else if (minAge != null && maxAge != null) {
+            patients = patientRepo.findByAgeRange(minAge, maxAge);
+        } else {
+            patients = patientRepo.findAll(); // or return empty list
+        }
+
+        return patients;
+    }
     @GetMapping("/findByAgeRange/{minAge}/{maxAge}")
     public List<Patient> findPatientsByAgeRange(@PathVariable int minAge, @PathVariable int maxAge) {
         return patientRepo.findByAgeRange(minAge, maxAge);
