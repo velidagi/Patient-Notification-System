@@ -11,9 +11,8 @@ public class PatientLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
     @JoinColumn(name = "patient_id")
-    private Patient patient;
+    private Long patientId;
 
     private String name;
 
@@ -52,12 +51,12 @@ public class PatientLog {
         this.id = id;
     }
 
-    public Patient getPatient() {
-        return patient;
+    public Long getPatientId() {
+        return patientId;
     }
 
-    public void setPatient(Patient patient) {
-        this.patient = patient;
+    public void setPatientId(Long patientId) {
+        this.patientId = patientId;
     }
 
     public String getName() {

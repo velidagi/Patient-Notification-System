@@ -44,7 +44,8 @@ public class PatientService {
     @Transactional
     public void addPatient(Patient patient) {
         patientRepository.save(patient);
-        logChange(patient, 1, "Added");
+        Long nextPatientId = patient.getId();
+        logChange(patient, 1, nextPatientId,"Added");
 
         if ((patient.getAge() > 50 && patient.getAge() <= 69) && patient.getGender().equalsIgnoreCase("Male")) {
             TargetCriteria targetCriteria = targetCriteriaRepo.findById(1L)
@@ -80,9 +81,10 @@ public class PatientService {
 
         filteredPatientRepository.save(filteredPatient);
     }
-    private void logChange(Patient patient, int versionNumber, String changeReason) {
+    private void logChange(Patient patient, int versionNumber,Long nextPatientId, String changeReason) {
         PatientLog patientLog = new PatientLog();
-        patientLog.setPatient(patient);
+
+        patientLog.setPatientId(nextPatientId);
         patientLog.setId(patient.getId());
         patientLog.setName(patient.getName());
         patientLog.setBirthDate(patient.getBirthDate());
@@ -165,12 +167,12 @@ public class PatientService {
 
         patientRepository.save(existingPatient);
         Optional<PatientLog> existingLogs = patientLogRepo.findById(existingPatient.getId());
-
+        Long nextPatientId = existingPatient.getId();
         int nextVersionNumber = existingLogs.stream()
                 .mapToInt(PatientLog::getVersionNumber)
                 .max()
                 .orElse(0) + 1;
-        logChange(existingPatient, nextVersionNumber +1, "Updated");
+        logChange(existingPatient, nextVersionNumber +1, nextPatientId, "Updated");
 
         filteredPatientRepository.deleteByPatient(existingPatient);
 
@@ -200,12 +202,12 @@ public class PatientService {
             filteredPatientRepository.deleteByPatientId(patientId);
             patientRepository.deleteById(patientId);
             Optional<PatientLog> existingLogs = patientLogRepo.findById(patientId);
-
+            Long nextPatientId =  patient.getId();
             int nextVersionNumber = existingLogs.stream()
                     .mapToInt(PatientLog::getVersionNumber)
                     .max()
                     .orElse(0) + 1;
-            logChange(patient, nextVersionNumber, "Deleted");
+            logChange(patient, nextVersionNumber, nextPatientId, "Deleted");
 
         }
     }
