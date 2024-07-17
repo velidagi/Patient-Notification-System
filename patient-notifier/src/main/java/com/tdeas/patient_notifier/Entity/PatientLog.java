@@ -1,11 +1,10 @@
 package com.tdeas.patient_notifier.Entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
-
 import java.util.Date;
 
 @Entity
+@Table(name = "Patient_Log")
 public class PatientLog {
 
     @Id
@@ -23,19 +22,28 @@ public class PatientLog {
 
     private String gender;
 
+    @Column(name = "national_id")
     private String nationalId;
 
+    @Column(name = "passport_number")
     private String passportNumber;
 
     private String email;
 
+    @Column(name = "phone_number")
     private String phoneNumber;
 
+    @Column(name = "notification_preference")
     private String notificationPreference;
 
+    @Column(name = "version_number")
     private int versionNumber;
 
+    @Column(name = "change_reason")
     private String changeReason;
+
+    // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -44,12 +52,18 @@ public class PatientLog {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public Patient getPatient() {
+        return patient;
     }
+
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
+
+    public String getName() {
+        return name;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -109,10 +123,10 @@ public class PatientLog {
     public void setNotificationPreference(String notificationPreference) {
         this.notificationPreference = notificationPreference;
     }
+
     public int getVersionNumber() {
         return versionNumber;
     }
-
 
     public void setVersionNumber(int versionNumber) {
         this.versionNumber = versionNumber;

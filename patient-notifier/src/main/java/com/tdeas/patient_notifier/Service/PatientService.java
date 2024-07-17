@@ -82,8 +82,8 @@ public class PatientService {
     }
     private void logChange(Patient patient, int versionNumber, String changeReason) {
         PatientLog patientLog = new PatientLog();
-        patientLog.setId(patient.getId());
         patientLog.setPatient(patient);
+        patientLog.setId(patient.getId());
         patientLog.setName(patient.getName());
         patientLog.setBirthDate(patient.getBirthDate());
         patientLog.setGender(patient.getGender());
@@ -97,6 +97,7 @@ public class PatientService {
 
         patientLogRepo.save(patientLog);
     }
+
     public List<NotificationResult> sendNotifications() {
         List<FilteredPatient> filteredNotifications = filteredPatientRepository.findAll();
         List<NotificationResult> notificationResults = new ArrayList<>();
@@ -148,7 +149,49 @@ public class PatientService {
     private void sendEmailNotification(String email, String message) {
         // E-posta gönderme işlemini gerçekleştirin
     }
+    @Transactional
+    public void updatePatient(Long id, Patient updatedPatient) {
+        Patient existingPatient = patientRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Patient not found"));
 
+        existingPatient.setName(updatedPatient.getName());
+        existingPatient.setBirthDate(updatedPatient.getBirthDate());
+        existingPatient.setGender(updatedPatient.getGender());
+        existingPatient.setNationalId(updatedPatient.getNationalId());
+        existingPatient.setPassportNumber(updatedPatient.getPassportNumber());
+        existingPatient.setEmail(updatedPatient.getEmail());
+        existingPatient.setPhoneNumber(updatedPatient.getPhoneNumber());
+        existingPatient.setNotificationPreference(updatedPatient.getNotificationPreference());
+
+        patientRepository.save(existingPatient);
+        Optional<PatientLog> existingLogs = patientLogRepo.findById(existingPatient.getId());
+
+        int nextVersionNumber = existingLogs.stream()
+                .mapToInt(PatientLog::getVersionNumber)
+                .max()
+                .orElse(0) + 1;
+        logChange(existingPatient, nextVersionNumber +1, "Updated");
+
+        filteredPatientRepository.deleteByPatient(existingPatient);
+
+        if ((existingPatient.getAge() > 50 && existingPatient.getAge() <= 69) && existingPatient.getGender().equalsIgnoreCase("Male")) {
+            TargetCriteria targetCriteria = targetCriteriaRepo.findById(1L)
+                    .orElseThrow(() -> new RuntimeException("Colon Cancer criteria not found"));
+            createFilteredPatient(existingPatient, targetCriteria);
+        }
+
+        if ((existingPatient.getAge() > 40 && existingPatient.getAge() <= 69) && existingPatient.getGender().equalsIgnoreCase("Female")) {
+            TargetCriteria targetCriteria = targetCriteriaRepo.findById(2L)
+                    .orElseThrow(() -> new RuntimeException("Breast Cancer criteria not found"));
+            createFilteredPatient(existingPatient, targetCriteria);
+        }
+
+        if (existingPatient.getAge() > 18 && existingPatient.getNotificationPreference().equalsIgnoreCase("SMS")) {
+            TargetCriteria targetCriteria = targetCriteriaRepo.findById(3L)
+                    .orElseThrow(() -> new RuntimeException("Stay Fit criteria not found"));
+            createFilteredPatient(existingPatient, targetCriteria);
+        }
+    }
     @Transactional
     public void deletePatient(Long patientId) {
         Optional<Patient> existingPatient = patientRepository.findById(patientId);
