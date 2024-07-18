@@ -9,7 +9,10 @@ import java.util.List;
 
 @Repository
 public interface FilteredPatientRepo extends JpaRepository<FilteredPatient, Long> {
+    // Delete filtered patient records
     void deleteByPatientId(Long patientId);
     void deleteByPatient(Patient patient);
+
+    // Find filtered patient records by patient ID
     List<FilteredPatient> findByPatientId(long l);
 }

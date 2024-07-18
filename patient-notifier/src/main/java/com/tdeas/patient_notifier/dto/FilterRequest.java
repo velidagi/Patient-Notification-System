@@ -5,6 +5,4 @@ public class FilterRequest {
     private Integer minAge;
     private Integer maxAge;
     private String notificationPreference;
-
-    // Getters and Setters
 }

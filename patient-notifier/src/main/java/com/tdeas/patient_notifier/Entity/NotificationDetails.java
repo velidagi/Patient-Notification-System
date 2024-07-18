@@ -7,5 +7,4 @@ public class NotificationDetails {
     private String notificationType;
     private String message;
 
-    // Getter ve Setter metotları
 }

@@ -32,15 +32,17 @@ public class PatientService {
     @Autowired
     private TargetCriteriaRepo targetCriteriaRepo;
 
-
+    // Get all patients
     public List<Patient> getAllPatients() {
         return patientRepository.findAll();
     }
 
+    // Get all filtered patients
     public List<FilteredPatient> getAllFilteredPatients() {
         return filteredPatientRepository.findAll();
     }
 
+    // Add a new patient and perform necessary actions based on criteria
     @Transactional
     public void addPatient(Patient patient) {
         patientRepository.save(patient);
@@ -66,6 +68,7 @@ public class PatientService {
         }
     }
 
+    // Create and save filtered patient
     private void createFilteredPatient(Patient patient, TargetCriteria targetCriteria) {
         FilteredPatient filteredPatient = new FilteredPatient();
         filteredPatient.setPatient(patient);
@@ -81,6 +84,8 @@ public class PatientService {
 
         filteredPatientRepository.save(filteredPatient);
     }
+
+    // Log patient change details
     private void logChange(Patient patient, int versionNumber,Long nextPatientId, String changeReason) {
         PatientLog patientLog = new PatientLog();
 
@@ -100,6 +105,7 @@ public class PatientService {
         patientLogRepo.save(patientLog);
     }
 
+    // Send notifications to filtered patients
     public List<NotificationResult> sendNotifications() {
         List<FilteredPatient> filteredNotifications = filteredPatientRepository.findAll();
         List<NotificationResult> notificationResults = new ArrayList<>();
@@ -139,18 +145,22 @@ public class PatientService {
         return notificationResults;
     }
 
+    // Log notification details
     private void logNotificationDetails(Long patientId, String patientName, String patientGender, String notificationType, String message) {
         logger.info("Notification sent to Patient ID: {}, Name: {}, Gender: {}, via {}: {}",
                 patientId, patientName, patientGender, notificationType, message);
     }
 
+    // Send SMS notification
     private void sendSmsNotification(String phoneNumber, String message) {
-        // SMS gönderme işlemini gerçekleştirin
+        // YOU CAN DEFINE SMS SENDING FUNCTION HERE
     }
 
     private void sendEmailNotification(String email, String message) {
-        // E-posta gönderme işlemini gerçekleştirin
+        // YOU CAN DEFINE EMAIL SENDING FUNCTION HERE
     }
+
+    // Update an existing patient and perform necessary actions based on criteria
     @Transactional
     public void updatePatient(Long id, Patient updatedPatient) {
         Patient existingPatient = patientRepository.findById(id)
@@ -176,18 +186,21 @@ public class PatientService {
 
         filteredPatientRepository.deleteByPatient(existingPatient);
 
+        // Check and create filtered patient for colon cancer criteria
         if ((existingPatient.getAge() > 50 && existingPatient.getAge() <= 69) && existingPatient.getGender().equalsIgnoreCase("Male")) {
             TargetCriteria targetCriteria = targetCriteriaRepo.findById(1L)
                     .orElseThrow(() -> new RuntimeException("Colon Cancer criteria not found"));
             createFilteredPatient(existingPatient, targetCriteria);
         }
 
+        // Check and create filtered patient for breast cancer criteria
         if ((existingPatient.getAge() > 40 && existingPatient.getAge() <= 69) && existingPatient.getGender().equalsIgnoreCase("Female")) {
             TargetCriteria targetCriteria = targetCriteriaRepo.findById(2L)
                     .orElseThrow(() -> new RuntimeException("Breast Cancer criteria not found"));
             createFilteredPatient(existingPatient, targetCriteria);
         }
 
+        // Check and create filtered patient for stay fit criteria
         if (existingPatient.getAge() > 18 && existingPatient.getNotificationPreference().equalsIgnoreCase("SMS")) {
             TargetCriteria targetCriteria = targetCriteriaRepo.findById(3L)
                     .orElseThrow(() -> new RuntimeException("Stay Fit criteria not found"));
@@ -195,6 +208,7 @@ public class PatientService {
         }
     }
 
+    // Delete a patient and perform necessary actions based on criteria
     @Transactional
     public void deletePatient(Long patientId) {
         Optional<Patient> existingPatient = patientRepository.findById(patientId);
@@ -208,7 +222,7 @@ public class PatientService {
                     .mapToInt(PatientLog::getVersionNumber)
                     .max()
                     .orElse(0) + 1;
-            logChange(patient, nextVersionNumber, nextPatientId, "Deleted");
+            logChange(patient, nextVersionNumber +1, nextPatientId, "Deleted");
 
         }
     }

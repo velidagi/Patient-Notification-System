@@ -23,36 +23,44 @@ public class PatientController {
     @Autowired
     private PatientRepo patientRepo;
 
+    // Get all patients
     @GetMapping
     public List<Patient> getAllPatients() {
         return patientService.getAllPatients();
     }
 
+    // Get all filtered patients
     @GetMapping("/filtered")
     public List<FilteredPatient> getAllFilteredPatients() {
         return patientService.getAllFilteredPatients();
     }
 
+    // Add a new patient
     @PostMapping
     public void addPatient(@RequestBody Patient patient) {
         patientService.addPatient(patient);
     }
 
+    // Update an existing patient by ID
     @PutMapping("/{id}")
     public ResponseEntity<?> updatePatient(@PathVariable Long id, @RequestBody Patient updatedPatient) {
         patientService.updatePatient(id, updatedPatient);
         return ResponseEntity.ok("Patient updated successfully");
     }
 
+    // Delete a patient by ID
     @DeleteMapping("/{id}")
     public void deletePatient(@PathVariable Long id) {
         patientService.deletePatient(id);
     }
 
+    // Find patients by name
     @GetMapping("/findByName/{name}")
     public List<Patient> findPatientsByName(@PathVariable String name) {
         return patientRepo.findByName(name);
     }
+
+    // Search patients with multiple criteria
     @GetMapping("/search")
     public List<Patient> searchPatients(
             @RequestParam(value = "name", required = false) String name,
@@ -74,15 +82,20 @@ public class PatientController {
 
         return patients;
     }
+
+    // Find patients by age range
     @GetMapping("/findByAgeRange/{minAge}/{maxAge}")
     public List<Patient> findPatientsByAgeRange(@PathVariable int minAge, @PathVariable int maxAge) {
         return patientRepo.findByAgeRange(minAge, maxAge);
     }
+
+    // Find patients by notification preference
     @GetMapping("/findByNotificationPreference/{preference}")
     public List<Patient> findPatientsByNotificationPreference(@PathVariable String preference) {
         return patientRepo.findByNotificationPreference(preference);
     }
 
+    // Send notifications to patients
     @PostMapping("/sendNotifications")
     public ResponseEntity<List<NotificationResult>> sendNotifications() {
         try {

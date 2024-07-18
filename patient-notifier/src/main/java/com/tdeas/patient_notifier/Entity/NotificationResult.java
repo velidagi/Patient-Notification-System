@@ -23,6 +23,7 @@ public class NotificationResult {
         this.age = age;
     }
 
+    // GETTER AND SETTERS
     public Long getPatientId() {
         return patientId;
     }
