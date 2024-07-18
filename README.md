@@ -1,7 +1,4 @@
 # Patient Notifier System
-## Project Development Process
-
-This project has been a true journey of learning and development for me. At the outset, my knowledge of Java and backend/frontend was zero, and I lacked the necessary experience to complete such a project. I had to learn many concepts from scratch and put in intensive effort to bring the project to fruition. I am extremely pleased with the outcomes of the project now, and it has been a rewarding experience.
 ## Overview
 
 This project is a Spring Boot application designed to manage patient information and send notifications based on specific criteria. It includes functionalities to add, update, delete, and search patients, as well as filter and notify patients based on defined criteria.
