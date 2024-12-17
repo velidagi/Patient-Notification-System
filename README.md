@@ -1,4 +1,6 @@
 # Patient Notifier System
+### For Frontend: https://github.com/velidagi/patient-notifier-ui
+
 ## Overview
 
 This project is a Spring Boot application designed to manage patient information and send notifications based on specific criteria. It includes functionalities to add, update, delete, and search patients, as well as filter and notify patients based on defined criteria.
